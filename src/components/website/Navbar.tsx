@@ -17,10 +17,27 @@ const navItems = [
 export default function Navbar() {
   const [isScrolled, setIsScrolled] = useState(false);
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+  const [activeSection, setActiveSection] = useState('');
 
   useEffect(() => {
     const handleScroll = () => {
       setIsScrolled(window.scrollY > 50);
+
+      // Detect active section based on scroll position
+      let current = '';
+      const offset = 100; // Offset from top
+
+      navItems.forEach((item) => {
+        const element = document.querySelector(item.href);
+        if (element) {
+          const elementTop = element.getBoundingClientRect().top;
+          if (elementTop <= offset) {
+            current = item.href;
+          }
+        }
+      });
+
+      setActiveSection(current);
     };
 
     window.addEventListener('scroll', handleScroll);
@@ -104,18 +121,36 @@ export default function Navbar() {
 
             {/* Desktop Navigation */}
             <div className="hidden md:flex space-x-8">
-              {navItems.map((item) => (
-                <motion.button
-                  key={item.href}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.95 }}
-                  onClick={() => handleNavClick(item.href)}
-                  className="text-gray-700 hover:text-blue-600 font-medium transition-colors duration-200 relative group  cursor-pointer"
-                >
-                  {item.label}
-                  <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 transition-all duration-300 group-hover:w-full"></span>
-                </motion.button>
-              ))}
+              {navItems.map((item) => {
+                const isActive = activeSection === item.href;
+                return (
+                  <motion.button
+                    key={item.href}
+                    whileHover={{ scale: 1.05 }}
+                    whileTap={{ scale: 0.95 }}
+                    onClick={() => handleNavClick(item.href)}
+                    className={`font-medium transition-colors duration-200 relative group cursor-pointer ${
+                      isActive ? 'text-blue-600' : 'text-gray-700 hover:text-blue-600'
+                    }`}
+                  >
+                    {item.label}
+                    
+                    {/* Animated underline - active state */}
+                    {isActive ? (
+                      <motion.span
+                        layoutId="activeUnderline"
+                        className="absolute bottom-0 left-0 right-0 h-0.5 bg-blue-600"
+                        initial={{ scaleX: 0 }}
+                        animate={{ scaleX: 1 }}
+                        transition={{ duration: 0.3, ease: 'easeInOut' }}
+                        style={{ originX: 0 }}
+                      />
+                    ) : (
+                      <span className="absolute bottom-0 left-0 w-0 h-0.5 bg-blue-600 transition-all duration-300 group-hover:w-full"></span>
+                    )}
+                  </motion.button>
+                );
+              })}
             </div>
 
             {/* Mobile Menu Button */}
@@ -153,18 +188,34 @@ export default function Navbar() {
               className="relative bg-white backdrop-blur-md border-b border-gray-200 shadow-lg"
             >
               <div className="px-4 py-6 space-y-2">
-                {navItems.map((item, index) => (
-                  <motion.button
-                    key={item.href}
-                    initial={{ opacity: 0, x: -100 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    transition={{ delay: index * 0.1, duration: 0.3 }}
-                    onClick={() => handleNavClick(item.href)}
-                    className="cursor-pointer block w-full text-left text-gray-700 hover:text-blue-600 font-medium py-4 px-3 rounded-lg hover:bg-gray-50 transition-all duration-200 text-lg"
-                  >
-                    {item.label}
-                  </motion.button>
-                ))}
+                {navItems.map((item, index) => {
+                  const isActive = activeSection === item.href;
+                  return (
+                    <motion.button
+                      key={item.href}
+                      initial={{ opacity: 0, x: -100 }}
+                      animate={{ opacity: 1, x: 0 }}
+                      transition={{ delay: index * 0.1, duration: 0.3 }}
+                      onClick={() => handleNavClick(item.href)}
+                      className={`cursor-pointer block w-full text-left font-medium py-4 px-3 rounded-lg transition-all duration-200 text-lg relative ${
+                        isActive
+                          ? 'text-blue-600 bg-blue-50'
+                          : 'text-gray-700 hover:text-blue-600 hover:bg-gray-50'
+                      }`}
+                    >
+                      {item.label}
+                      {isActive && (
+                        <motion.span
+                          className="absolute left-0 top-0 bottom-0 w-1 bg-blue-600 rounded-r"
+                          initial={{ scaleY: 0 }}
+                          animate={{ scaleY: 1 }}
+                          transition={{ duration: 0.3, ease: 'easeInOut' }}
+                          style={{ originY: 0 }}
+                        />
+                      )}
+                    </motion.button>
+                  );
+                })}
               </div>
             </motion.div>
           </div>

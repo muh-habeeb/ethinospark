@@ -46,7 +46,7 @@ export async function POST(request: NextRequest) {
     // Convert file to buffer
     const bytes = await file.arrayBuffer();
     const buffer = Buffer.from(bytes);
-
+    
     // Generate filename from original file name
     const fileName = file.name.split('.')[0] || 'image';
 
