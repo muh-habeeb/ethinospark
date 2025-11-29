@@ -143,7 +143,7 @@ export default function Home() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50 select-none">
+    <div className="min-h-screen bg-gray-50 select-none [s]">
       <Navbar />
       {announcements.length > 0 && <AnnouncementMarquee announcements={announcements} />}
       <HeroSection
